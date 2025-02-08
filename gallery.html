@@ -84,6 +84,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
         }
     
         .modal-content {
@@ -99,6 +100,21 @@
             font-size: 40px;
             cursor: pointer;
         }
+    
+        .modal-prev, .modal-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.5);
+            color: black;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+        }
+    
+        .modal-prev { left: 10px; }
+        .modal-next { right: 10px; }
     </style>
 </head>
 <!-- body -->
@@ -189,7 +205,7 @@
                 
                 <div class="custom-col">
                     <div class="custom-card">
-                        <img src="images/farm/chicken9.jpg" class="custom-card-img-top" alt="Asset Image" onclick="openModal(this)">
+                        <img src="images/farm/chicken3.jpg" class="custom-card-img-top" alt="Asset Image" onclick="openModal(this)">
                     </div>
                 </div>
                 
@@ -267,7 +283,7 @@
 
                 <div class="custom-col">
                     <div class="custom-card">
-                        <img src="images/farm/chiken8.jpg" class="custom-card-img-top" alt="Asset Image" onclick="openModal(this)">
+                        <img src="images/farm/chiken7.jpg" class="custom-card-img-top" alt="Asset Image" onclick="openModal(this)">
                     </div>
                 </div>
                 <div class="custom-col">
@@ -287,10 +303,12 @@
     </section>    
     
     <!-- Image Modal -->
-<div id="imageModal" class="modal" onclick="closeModal()">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modalImage">
-</div>
+    <div id="imageModal" class="modal" style="display: none;" onclick="closeModal(event)">
+        <span class="close" onclick="closeModal(event)">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <button class="modal-prev" onclick="prevImage(event)">❮</button>
+        <button class="modal-next" onclick="nextImage(event)">❯</button>
+    </div>
 
     <!-- contact -->
 
@@ -416,34 +434,24 @@
     <!-- javascript -->
     <script src="js/owl.carousel.js"></script>
     <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+    
     <script>
-        function openModal(img) {
-            document.getElementById('imageModal').style.display = 'flex';
-            document.getElementById('modalImage').src = img.src;
-        }
-    
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-    
         let currentPage = 1;
         const itemsPerPage = 16;
         const cards = document.querySelectorAll('.custom-col');
         const totalPages = Math.ceil(cards.length / itemsPerPage);
     
+        // Function to show specific page
         function showPage(page) {
             cards.forEach((card, index) => {
                 card.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? 'block' : 'none';
             });
+            // Update visibility of Next/Previous buttons
+            document.getElementById('custom-prevBtn').style.display = page > 1 ? 'block' : 'none';
+            document.getElementById('custom-nextBtn').style.display = page < totalPages ? 'block' : 'none';
         }
     
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                showPage(currentPage);
-            }
-        }
-    
+        // Next page functionality
         function nextPage() {
             if (currentPage < totalPages) {
                 currentPage++;
@@ -451,7 +459,49 @@
             }
         }
     
-        showPage(currentPage);
+        // Previous page functionality
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+    
+        // Initialize the page by showing the first page
+        window.onload = function() {
+            showPage(currentPage);
+        }
+    </script>
+    
+    <script>
+        let currentImageIndex = 0;
+        let images = document.querySelectorAll('.custom-card img');
+    
+        function openModal(img) {
+            let modal = document.getElementById('imageModal');
+            let modalImg = document.getElementById('modalImage');
+            modal.style.display = 'flex';
+            modalImg.src = img.src;
+            currentImageIndex = Array.from(images).indexOf(img);
+        }
+    
+        function closeModal(event) {
+            if (event.target.id === 'imageModal' || event.target.className === 'close') {
+                document.getElementById('imageModal').style.display = 'none';
+            }
+        }
+    
+        function prevImage(event) {
+            event.stopPropagation();
+            currentImageIndex = (currentImageIndex > 0) ? currentImageIndex - 1 : images.length - 1;
+            document.getElementById('modalImage').src = images[currentImageIndex].src;
+        }
+    
+        function nextImage(event) {
+            event.stopPropagation();
+            currentImageIndex = (currentImageIndex < images.length - 1) ? currentImageIndex + 1 : 0;
+            document.getElementById('modalImage').src = images[currentImageIndex].src;
+        }
     </script>
 
     <script>
